@@ -1,12 +1,10 @@
 import time
 import copy
-
-
-i1 = 1
-j1 = 0
+import random
+from config import grid_configs
 
 class JeuDeLaVie:
-  def __init__(self, tableau):
+  def __init__(self, tableau = []):
     """
     Affecte un tableau à l'attribut tableau
 
@@ -15,28 +13,22 @@ class JeuDeLaVie:
     self.tableau = tableau
     self.symboleVivant = "X"
     self.symboleMort = "-"
-    self.preconfs = {
-      "spaceship":
-      [
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 1, 1, 1, 0],
-        [0, 1, 0, 0, 0, 1, 0],
-        [0, 0, 0, 0, 0, 1, 0],
-        [0, 1, 0, 0, 1, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-      ]
-    }
+    self.preconfs = grid_configs
 
   def setPreconf(self, nom):
     if nom not in self.preconfs:
-      print("Il n'existe aucune préconfiguration avec le nom", nom)
+      print("Il n'existe aucune préconfiguration avec le nom", nom, ". Utilisation de la configuration par défaut")
+      return False
+    print("Préconfiguration définie sur", nom)
     self.tableau = self.preconfs[nom]
 
   def afficherPreconfs(self):
     print("Liste des préconfigurations: ")
-    for preconf in self.preconfs.keys():
+    for preconf in self.preconfs:
       print("-", preconf)
+    return self.preconfs
+
+  def getPreconfs(self):
     return self.preconfs
 
   def getTableau(self):
@@ -45,13 +37,14 @@ class JeuDeLaVie:
   def setTableau(self, nouveau_tableau):
     self.tableau = nouveau_tableau
     return nouveau_tableau
-  
-  def setSymboleVivant(self, nouveau_symbole):
-    self.symboleVivant = nouveau_symbole
-  
-  def setSymboleMort(self, nouveau_symbole):
-    self.symboleMort = nouveau_symbole
 
+  def choixSymbole(self):
+    choix = input("Symbole d'une cellule vivante (Défaut: X): ")
+    if choix != "":
+      self.symboleVivant = choix
+    choix = input("Symbole d'une cellule morte (Défaut: -): ")
+    if choix != "":
+      self.symboleMort = choix
 
   # def __repr__(self) -> str:
   #   texte = ""
@@ -120,39 +113,23 @@ class JeuDeLaVie:
     else:
       print("erreur", totalvoisins)
       return valeurcase
-    
-    # if valeurcase == 0: # une cellule morte possédant exactement trois voisines vivantes devient vivante: elle naît
-    #   if totalvoisins == 3:
-    #     return 1
-    # elif valeurcase == 1: # une cellule vivante possédant deux ou trois voisines vivantes le reste, sinon elle meurt
-    #   if totalvoisins == 2 or totalvoisins == 3: 
-    #     return 1
-    #   else:
-    #     return 0
-    # else:
-    #   print("La valeur de la case est invalide")
-    #   return -1
-    # return valeurcase # Sinon, la cellule ne change pas d'état
-  
+
   def tour(self):
     """
       Met à jour toutes les cellules du tableau en respectant les règles du jeu de la vie.
     """
     # On parcourt chaque case du tableau
     nouveautab = copy.deepcopy(self.tableau)
-    # nouveautab = []
     
     for ligne in range(len(self.tableau)):
-      # nouveautab.append([])
       for case in range(len(self.tableau[ligne])):
-        # nouveautab[ligne].append(0)
         valeur = self.valeur_case(ligne, case)
         voisins = self.total_voisins(ligne, case)
         resultat = self.resultat(valeur, voisins)
         nouveautab[ligne][case] = resultat
     if(nouveautab == self.tableau):
-      return False
-    self.tableau = nouveautab
+      return False # Si le tableau n'a pas changé on arrête le programme
+    self.tableau = nouveautab # On mets à jour le tableau
     return True                   
 
   def run(self, nombre_tours, delai):
@@ -178,6 +155,16 @@ class JeuDeLaVie:
     else:
       print("Fin du programme")
 
+  def grille_aleatoire(self):
+    for ligne in range(len(self.tableau)):
+      for case in range(len(self.tableau[ligne])):
+        self.tableau[ligne][case] = random.randint(0, 1)
+
+
+  
+
+
+
 tableau1 = [
   [0, 1, 1, 0],
   [0, 1, 0, 0],
@@ -189,25 +176,20 @@ tableau2 =[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,
 
 tableau3 =[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
 
-# mon_jeu = JeuDeLaVie([
-#   [0, 0, 0],
-#   [1, 1, 1],
-#   [0, 0, 0]
-# ])
-# mon_jeu = JeuDeLaVie(tableau3)
-# mon_jeu.afficherPreconfs()
-# mon_jeu.setPreconf('spaceship')
+if __name__ == "__main__":
+  print("-------------------- Jeu de la Vie --------------------\n")
 
-# mon_jeu = JeuDeLaVie([
-#   [0, 0, 1, 0],
-#   [1, 0, 0, 1],
-#   [0, 0, 1, 0],
-#   [1, 1, 0, 0]
-# ])
-# mon_jeu = JeuDeLaVie([
-#   [0, 0, 0, 0],
-#   [0, 0, 0, 1],
-#   [1, 0, 0, 0],
-#   [0, 0, 0, 0]
-# ])
-mon_jeu.run(600, 0.5)
+  mon_jeu = JeuDeLaVie(tableau3)
+  mon_jeu.choixSymbole()
+  aleatoire = input("Voulez-vous générer une grille aléatoire ? (Y/N)")
+  if aleatoire == "Y":
+    mon_jeu.grille_aleatoire()
+  # print("Veuillez choisir une préconfiguration:")
+  # mon_jeu.afficherPreconfs()
+  # preconf = input("\nPréconfiguration: ")
+  # mon_jeu.setPreconf(preconf)
+  nombre_tours = int(input("\nNombre de tours: "))
+  delai = float(input("\nDélai entre chaque tour: "))
+  # print("Lancement du jeu de la vie avec la préconfiguration", preconf, "pour", nombre_tours, "tours avec un délai de", delai, "secondes entre chaque tour...")
+  mon_jeu.run(nombre_tours, delai)
+  print("\n-------------------- Jeu de la Vie --------------------")
